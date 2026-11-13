@@ -181,3 +181,4 @@ O script SQL já inclui um usuário administrador pré-configurado:
 - **Curso:** Técnico em Informática Integrado ao Ensino Médio
 - **Disciplina:** Desenvolvimento de Sistemas Web
 - **Ano:** 2025 / 2026
+

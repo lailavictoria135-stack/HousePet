@@ -180,3 +180,4 @@ document.getElementById('inputFotoPet').addEventListener('change', function(e) {
 </script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+

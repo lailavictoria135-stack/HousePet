@@ -46,3 +46,4 @@ $stmtDel->execute([$id]);
 
 setFlashMessage('success', 'Publicação do animal removida com sucesso.');
 redirect($baseUrl . '/usuario/dashboard.php');
+

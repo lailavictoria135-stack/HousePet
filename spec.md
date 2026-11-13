@@ -191,3 +191,4 @@ housePet2/
    - Aprovam ou rejeitam animais para adoção e publicações de animais desaparecidos.
    - Todas as decisões de moderação são registradas com data, moderador responsável e observação na tabela `moderacoes`.
    - Administradores (`admin`) têm controle adicional sobre a gestão de usuários (ativar/desativar e promover papéis).
+

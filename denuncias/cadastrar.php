@@ -191,3 +191,4 @@ document.getElementById('inputFotoDenuncia').addEventListener('change', function
 </script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
