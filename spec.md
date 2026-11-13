@@ -1,194 +1,177 @@
-# ESPECIFICAÇÃO COMPLETA DO SISTEMA — HOUSEPET
+# ESPECIFICAÇÃO FINAL DO SISTEMA — HOUSEPET
 
-## 1. INFORMAÇÕES DO PROJETO
-
-- **Nome do Sistema:** HousePet
-- **Propósito:** Plataforma web de proteção e bem-estar animal que reúne registro de denúncias de maus-tratos, divulgação de animais disponíveis para adoção e divulgação de animais desaparecidos.
-- **Público-alvo:** Tutores de animais, pessoas que resgatam ou encontram animais em risco, voluntários, protetores independentes, interessados em adoção responsável e equipe de moderação/administração.
-- **Contexto:** Atividade acadêmica do Instituto Federal de Educação, Ciência e Tecnologia de Rondônia (IFRO), Curso Técnico em Informática Integrado ao Ensino Médio.
+> **Atividade Acadêmica:** Curso Técnico em Informática Integrado ao Ensino Médio  
+> **Instituição:** Instituto Federal de Rondônia (IFRO)  
+> **Disciplina:** Desenvolvimento de Sistemas Web  
+> **Metodologia:** Programar com IA de forma responsável (Planejamento, Revisão Humana, Teste e Publicação)
 
 ---
 
-## 2. STACK TECNOLÓGICA E REQUISITOS TÉCNICOS
+## 1. INFORMAÇÕES DO PROJETO E OBJETIVO
 
-- **Linguagem Backend:** PHP 8+ (sem frameworks externos)
-- **Banco de Dados:** MySQL / MariaDB via extensão PDO com prepared statements
-- **Frontend:** HTML5 semântico, CSS3 responsivo (Mobile First), JavaScript puro (ES6+)
-- **Bibliotecas/CDNs:** Google Fonts (Poppins), Font Awesome 6.5 (ícones)
-- **Segurança:**
-  - Hashing de senhas via `password_hash()` com algoritmo padrão Bcrypt / Argon2
-  - Validação e sanitização no servidor (`htmlspecialchars()`, `trim()`, tipos estritos)
-  - Prevenção contra SQL Injection via Prepared Statements em 100% das consultas
-  - Prevenção contra CSRF via tokens criptográficos por sessão
-  - Proteção e ocultação dos dados pessoais de denunciantes na área pública
-  - Validação estrita de upload de imagens (MIME type, extensão, limite de 5MB, renomeação com hash/UUID aleatório)
-  - Controle de acesso baseado em papéis (`usuario`, `moderador`, `admin`)
-  - Gestão segura de sessões PHP (`session_regenerate_id()`, destruição completa em logout)
-- **Versionamento:** Git na branch principal `main`, conectado ao repositório remoto `https://github.com/lailavictoria135-stack/HousePet.git`
+- **Nome da Aplicação:** HousePet
+- **Propósito:** Plataforma web integrada de proteção e bem-estar animal que centraliza denúncias de maus-tratos, catálogo de animais disponíveis para adoção responsável e mural de animais desaparecidos.
+- **Público-alvo:** Tutores, resgatistas independentes, pessoas que presenciam animais em risco, adotantes voluntários e moderadores.
+- **Objetivo Principal:** Substituir a divulgação dispersa e não moderada em redes sociais e grupos de mensagens por uma aplicação estruturada com banco de dados relacional, controle de acesso e auditoria.
 
 ---
 
-## 3. ARQUITETURA E ESTRUTURA DE DIRETÓRIOS
+## 2. USUÁRIOS E PERFIS DE ACESSO
 
-```
-housePet2/
-│
-├── config/
-│   └── database.php                # Conexão PDO segura e configuração de ambiente
-│
-├── public/
-│   ├── assets/
-│   │   ├── css/
-│   │   │   └── style.css           # Estilos globais, temas, componentes e responsividade
-│   │   ├── js/
-│   │   │   └── main.js             # Validações, interatividade, alertas, preview de imagens
-│   │   └── images/                 # Assets gráficos e imagens estáticas
-│   └── uploads/                    # Imagens enviadas por usuários (animais, denúncias)
-│       ├── animais/
-│       ├── denuncias/
-│       └── desaparecidos/
-│
-├── includes/
-│   ├── header.php                  # Cabeçalho global, navbar responsiva, flash messages
-│   ├── footer.php                  # Rodapé com links institucionais e scripts
-│   ├── auth.php                    # Middlewares de autorização (requireLogin, requireAdmin)
-│   └── functions.php               # Utilitários de sanitização, uploads, CSRF e formatação
-│
-├── auth/
-│   ├── login.php                   # Autenticação de usuários
-│   ├── cadastro.php                # Registro de novos usuários comuns
-│   └── logout.php                  # Encerramento seguro de sessão
-│
-├── denuncias/
-│   ├── index.php                   # Visualização informativa pública e aviso oficial
-│   ├── cadastrar.php               # Formulário de registro de denúncias
-│   └── minhas_denuncias.php        # Acompanhamento exclusivo do denunciante
-│
-├── adocao/
-│   ├── index.php                   # Catálogo público com filtros e busca
-│   ├── cadastrar.php               # Cadastro de animal para doação
-│   ├── detalhes.php                # Perfil completo e manifestação de interesse
-│   └── editar.php                  # Edição e atualização de status pelo tutor
-│
-├── desaparecidos/
-│   ├── index.php                   # Mural público com filtros de busca
-│   ├── cadastrar.php               # Registro de animal desaparecido
-│   ├── detalhes.php                # Informações, contato e botão "Marcar como Encontrado"
-│   └── editar.php                  # Edição das informações pelo tutor
-│
-├── usuario/
-│   ├── dashboard.php               # Painel pessoal, publicações, denúncias e mensagens
-│   └── editar_perfil.php           # Atualização de dados cadastrais e senha
-│
-├── admin/
-│   ├── dashboard.php               # Métricas, contadores e atalhos de moderação
-│   ├── usuarios.php                # Gestão de usuários, papéis e ativação
-│   ├── denuncias.php               # Moderação de denúncias (aprovar/rejeitar/análise)
-│   ├── adocoes.php                 # Moderação e acompanhamento de adoções
-│   ├── desaparecidos.php           # Moderação de registros de desaparecidos
-│   └── moderacao.php               # Log e histórico de ações de moderadores
-│
-├── database/
-│   └── housepet_db.sql             # Script DDL/DML completo e dados iniciais
-│
-├── .env.example                    # Exemplo de configuração de variáveis de ambiente
-├── .gitignore                      # Regras de exclusão do controle de versão
-├── README.md                       # Documentação técnica e guia de instalação
-├── spec.md                         # Este documento de especificação
-└── index.php                       # Página inicial institucional e destaques
-```
+1. **Visitante (Não Autenticado):**
+   - Visualiza a página inicial, notícias institucionais e canais oficiais de denúncia.
+   - Consulta o catálogo de animais para adoção e o mural de animais desaparecidos com filtros.
+   - Não pode publicar ou solicitar adoção sem login.
+2. **Usuário Comum (`usuario`):**
+   - Registra denúncias com garantia de sigilo de identidade.
+   - Cadastra animais para adoção e pets desaparecidos (entrando na fila de moderação).
+   - Manifesta interesse formal de adoção enviando mensagem motivacional ao tutor.
+   - Gerencia suas publicações, contatos de interessados e atualiza dados do seu perfil.
+   - Pode marcar pet desaparecido como "Encontrado".
+3. **Moderador e Administrador (`moderador`, `admin`):**
+   - Acesso exclusivo ao Painel de Moderação (`/admin/`).
+   - Avalia, aprova ou rejeita denúncias, anúncios de adoção e pets desaparecidos.
+   - Registra justificativa em cada ação, mantendo trilha de auditoria na tabela `moderacoes`.
+   - Administradores (`admin`) possuem gestão completa de usuários (ativação e papéis).
 
 ---
 
-## 4. MODELO DE DADOS (MYSQL)
+## 3. INSTALAÇÃO E EXECUÇÃO (GUIA DO PROFESSOR / AVALIADOR)
 
-### Tabelas do Sistema:
+Esta seção foi concebida para que qualquer avaliador consiga clonar e colocar o sistema para rodar em um computador novo sem necessidade de intervenção externa.
 
-1. **usuarios**
-   - `id` (INT PK AUTO_INCREMENT)
-   - `nome` (VARCHAR(100) NOT NULL)
-   - `email` (VARCHAR(150) NOT NULL UNIQUE)
-   - `senha` (VARCHAR(255) NOT NULL - hash Bcrypt)
-   - `tipo_usuario` (ENUM('usuario','moderador','admin') NOT NULL DEFAULT 'usuario')
-   - `ativo` (TINYINT(1) NOT NULL DEFAULT 1)
-   - `data_cadastro` (TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)
+### 3.1 Ambiente
+- **Linguagem Backend:** PHP 8.2 ou superior (testado em PHP 8.2.12).
+- **Servidor Web Local:** Apache via **XAMPP** (ou servidor embutido do PHP: `php -S localhost:8000`).
+- **Extensões PHP obrigatórias:** `pdo_mysql`, `fileinfo`, `mbstring`, `session`.
+- **Bibliotecas / Dependências externas:** Nenhuma dependência local necessária via Composer ou npm. O sistema utiliza PHP puro moderno e bibliotecas de interface consumidas diretamente via CDN confiável (Google Fonts Poppins e Font Awesome 6.5).
+- **Sistema Operacional Testado:** Windows 10 / Windows 11 (compatível com Linux e macOS).
 
-2. **denuncias**
-   - `id` (INT PK AUTO_INCREMENT)
-   - `usuario_id` (INT NULL FK -> usuarios(id) ON DELETE SET NULL)
-   - `descricao` (TEXT NOT NULL)
-   - `tipo_ocorrencia` (VARCHAR(100) NOT NULL)
-   - `localizacao` (VARCHAR(255) NOT NULL)
-   - `data_ocorrencia` (DATE NULL)
-   - `informacoes_animal` (TEXT NULL)
-   - `imagem` (VARCHAR(255) NULL)
-   - `status` (ENUM('pendente','em_analise','aprovada','rejeitada') NOT NULL DEFAULT 'pendente')
-   - `data_cadastro` (TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)
+### 3.2 Banco de Dados
+- **SGBD Utilizado:** MySQL 8.0+ ou MariaDB 10.4+.
+- **Nome do Banco de Dados:** `housepet_db`
+- **Charset / Collation:** `utf8mb4` / `utf8mb4_unicode_ci`
+- **Caminho do Script SQL:** `database/housepet_db.sql` (ou `database/schema.sql`).
+- **Como Executar:** Pode ser importado via phpMyAdmin (`http://localhost/phpmyadmin/`), MySQL Workbench ou pelo terminal com:
+  ```bash
+  mysql -u root -p housepet_db < database/housepet_db.sql
+  ```
+- **Dados Iniciais:** O script já insere automaticamente o usuário Administrador padrão do sistema.
 
-3. **animais**
-   - `id` (INT PK AUTO_INCREMENT)
-   - `usuario_id` (INT NULL FK -> usuarios(id) ON DELETE SET NULL)
-   - `nome` (VARCHAR(100) NOT NULL)
-   - `especie` (VARCHAR(50) NOT NULL)
-   - `raca` (VARCHAR(100) NULL)
-   - `idade` (VARCHAR(50) NULL)
-   - `sexo` (ENUM('macho','femea','nao_informado') NOT NULL DEFAULT 'nao_informado')
-   - `porte` (ENUM('pequeno','medio','grande','gigante') NOT NULL DEFAULT 'medio')
-   - `descricao` (TEXT NULL)
-   - `imagem` (VARCHAR(255) NULL)
-   - `localizacao` (VARCHAR(255) NULL)
-   - `contato` (VARCHAR(255) NULL)
-   - `status` (ENUM('pendente','disponivel','em_adocao','adotado','rejeitado') NOT NULL DEFAULT 'pendente')
-   - `data_cadastro` (TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)
+#### Modelo de Dados e Relacionamentos:
 
-4. **adocoes**
-   - `id` (INT PK AUTO_INCREMENT)
-   - `animal_id` (INT NOT NULL FK -> animais(id) ON DELETE CASCADE)
-   - `usuario_interessado_id` (INT NOT NULL FK -> usuarios(id) ON DELETE CASCADE)
-   - `mensagem` (TEXT NULL)
-   - `status` (ENUM('pendente','aprovado','rejeitado') NOT NULL DEFAULT 'pendente')
-   - `data_cadastro` (TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)
+| Tabela | Campos Principais | Chave Primária | Relacionamentos (Chaves Estrangeiras) |
+|---|---|---|---|
+| **usuarios** | id, nome, email, senha, tipo_usuario, ativo, data_cadastro | `id` | — |
+| **denuncias** | id, usuario_id, descricao, tipo_ocorrencia, localizacao, data_ocorrencia, informacoes_animal, imagem, status, data_cadastro | `id` | `usuario_id` → `usuarios.id` (ON DELETE SET NULL) |
+| **animais** | id, usuario_id, nome, especie, raca, idade, sexo, porte, descricao, imagem, localizacao, contato, status, data_cadastro | `id` | `usuario_id` → `usuarios.id` (ON DELETE SET NULL) |
+| **adocoes** | id, animal_id, usuario_interessado_id, mensagem, status, data_cadastro | `id` | `animal_id` → `animais.id` (ON DELETE CASCADE)<br>`usuario_interessado_id` → `usuarios.id` (ON DELETE CASCADE) |
+| **desaparecidos** | id, usuario_id, nome_animal, especie, raca, caracteristicas, imagem, local_desaparecimento, data_desaparecimento, contato, status, data_cadastro | `id` | `usuario_id` → `usuarios.id` (ON DELETE SET NULL) |
+| **moderacoes** | id, moderador_id, tipo_conteudo, conteudo_id, decisao, observacao, data_moderacao | `id` | `moderador_id` → `usuarios.id` (ON DELETE CASCADE) |
 
-5. **desaparecidos**
-   - `id` (INT PK AUTO_INCREMENT)
-   - `usuario_id` (INT NULL FK -> usuarios(id) ON DELETE SET NULL)
-   - `nome_animal` (VARCHAR(100) NOT NULL)
-   - `especie` (VARCHAR(50) NOT NULL)
-   - `raca` (VARCHAR(100) NULL)
-   - `caracteristicas` (TEXT NULL)
-   - `imagem` (VARCHAR(255) NULL)
-   - `local_desaparecimento` (VARCHAR(255) NOT NULL)
-   - `data_desaparecimento` (DATE NULL)
-   - `contato` (VARCHAR(255) NOT NULL)
-   - `status` (ENUM('pendente','desaparecido','encontrado','rejeitado') NOT NULL DEFAULT 'pendente')
-   - `data_cadastro` (TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)
+### 3.3 Variáveis de Ambiente
+O repositório disponibiliza o modelo de configuração [.env.example](file:///c:/xampp/htdocs/housePet2/.env.example). Para rodar localmente, copie o arquivo para `.env` na raiz do projeto.
 
-6. **moderacoes**
-   - `id` (INT PK AUTO_INCREMENT)
-   - `moderador_id` (INT NOT NULL FK -> usuarios(id) ON DELETE CASCADE)
-   - `tipo_conteudo` (ENUM('denuncia','animal','desaparecido') NOT NULL)
-   - `conteudo_id` (INT NOT NULL)
-   - `decisao` (ENUM('aprovado','rejeitado','em_analise') NOT NULL)
-   - `observacao` (TEXT NULL)
-   - `data_moderacao` (TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)
+| Variável | Descrição / Finalidade | Exemplo de Preenchimento Local |
+|---|---|---|
+| `DB_HOST` | Endereço do servidor MySQL | `localhost` ou `127.0.0.1` |
+| `DB_NAME` | Nome do banco de dados relacional | `housepet_db` |
+| `DB_USER` | Usuário com permissão no MySQL | `root` |
+| `DB_PASS` | Senha do usuário do banco | *(vazio no XAMPP padrão, ou a senha do seu SGBD)* |
+| `APP_URL` | URL base da aplicação no navegador | `http://localhost/housePet2` |
+
+> *Nota Técnica:* O arquivo `config/database.php` possui parser nativo para o arquivo `.env` e inclui fallback de conexões resiliente para ambientes escolares de laboratório.
+
+### 3.4 Passo a Passo de Instalação Completo
+
+1. **Clonar o Repositório:**
+   Abra o terminal dentro da pasta `htdocs` do seu servidor web (ex: `C:\xampp\htdocs\`):
+   ```bash
+   git clone https://github.com/lailavictoria135-stack/HousePet.git housePet2
+   ```
+
+2. **Entrar na pasta do projeto:**
+   ```bash
+   cd housePet2
+   ```
+
+3. **Configurar as Variáveis de Ambiente:**
+   Copie o arquivo `.env.example` para `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+   *(No Windows PowerShell: `Copy-Item .env.example .env`)*
+
+4. **Criar e Importar o Banco de Dados:**
+   - Inicie o **Apache** e o **MySQL** no XAMPP Control Panel.
+   - Abra o phpMyAdmin (`http://localhost/phpmyadmin/`).
+   - Crie o banco de dados `housepet_db` (Collation: `utf8mb4_unicode_ci`).
+   - Na aba **Importar**, selecione o arquivo `database/housepet_db.sql` e execute.
+
+5. **Acessar o Sistema no Navegador:**
+   Abra seu navegador no endereço:
+   ```text
+   http://localhost/housePet2/
+   ```
 
 ---
 
-## 5. REGRAS DE NEGÓCIO E CONTROLE DE ACESSO
+## 4. ROTEIRO DE TESTES E FLUXO PRINCIPAL
 
-1. **Visitantes (Não Autenticados):**
-   - Podem navegar pela página inicial, ver animais disponíveis para adoção, consultar animais desaparecidos e acessar a área informativa de denúncias.
-   - Não podem cadastrar publicações ou manifestar interesse de adoção sem login.
-2. **Usuários Autenticados (`usuario`):**
-   - Podem registrar denúncias e acompanhar o status das suas próprias denúncias. Os dados do denunciante são protegidos e nunca exibidos para outros usuários comuns.
-   - Podem publicar animais para adoção e cadastrar animais desaparecidos. As publicações entram inicialmente com status `pendente` para moderação.
-   - Podem demonstrar interesse em animais disponíveis para adoção enviando mensagem motivacional.
-   - Podem gerenciar seus animais cadastrados, visualizar os contatos dos interessados, aprovar adoção e marcar animais desaparecidos como "Encontrado".
-   - Podem atualizar seu nome, e-mail e senha no painel.
-3. **Moderadores e Administradores (`moderador`, `admin`):**
-   - Têm acesso ao painel `/admin/`.
-   - Analisam e alteram status de denúncias (`pendente`, `em_analise`, `aprovada`, `rejeitada`).
-   - Aprovam ou rejeitam animais para adoção e publicações de animais desaparecidos.
-   - Todas as decisões de moderação são registradas com data, moderador responsável e observação na tabela `moderacoes`.
-   - Administradores (`admin`) têm controle adicional sobre a gestão de usuários (ativar/desativar e promover papéis).
+### 4.1 Usuário Pré-Cadastrado para Avaliação
+- **E-mail:** `admin@housepet.com`
+- **Senha:** `Admin123!`
+- **Perfil:** Administrador (`admin`)
 
+*(Caso queira criar uma conta comum nova, utilize o botão "Cadastrar" na barra de navegação).*
+
+### 4.2 Roteiro do Fluxo Principal (Passo a Passo)
+
+1. **Navegação Pública:**
+   - Acesse a página inicial (`/`). Veja os destaques, métricas dinâmicas, seção de conscientização e canais oficiais.
+   - Acesse a página **Adoção** (`/adocao/index.php`) e use os filtros por espécie, porte e localização.
+   - Acesse a página **Desaparecidos** (`/desaparecidos/index.php`) e teste a busca geográfica.
+   - Acesse a página **Denúncias** (`/denuncias/index.php`) e leia o aviso legal sobre os canais oficiais (190, 181, Ibama).
+
+2. **Autenticação e Cadastro:**
+   - Clique em **Entrar** (`/auth/login.php`) e faça login com as credenciais do Administrador (`admin@housepet.com` / `Admin123!`).
+
+3. **Publicação e Interesses:**
+   - Acesse o menu do usuário e clique em **Cadastrar Animal** (`/adocao/cadastrar.php`). Preencha os campos e anexe uma foto.
+   - Acesse a visualização do animal em **Adoção** e veja os botões de ação e a área de manifestação de interesse.
+   - Registre um pet em **Divulgar Desaparecido** (`/desaparecidos/cadastrar.php`).
+   - Na tela de detalhes do pet desaparecido, teste o botão **"Marcar como Encontrado"**.
+
+4. **Registro de Denúncia:**
+   - Acesse **Fazer Denúncia** (`/denuncias/cadastrar.php`), preencha o relato, localização e anexo.
+   - Acesse **Minhas Denúncias** (`/denuncias/minhas_denuncias.php`) e veja o acompanhamento com status.
+   - Abra os detalhes da denúncia (`/denuncias/view.php`) e comprove que o sigilo dos dados do denunciante é mantido.
+
+5. **Painel de Moderação e Auditoria:**
+   - Como Administrador, acesse **Painel Admin** (`/admin/dashboard.php`).
+   - Acesse **Moderação de Denúncias** (`/admin/denuncias.php`) e aprove/rejeite a ocorrência cadastrada informando uma observação.
+   - Acesse **Moderação de Adoções** (`/admin/adocoes.php`) e aprove o animal para o catálogo público.
+   - Acesse **Histórico de Moderação** (`/admin/moderacao.php`) e audite o log com a data, moderador e justificativa gravada.
+   - Acesse **Gestão de Usuários** (`/admin/usuarios.php`) e comprove a ativação/desativação e promoção de papéis.
+
+---
+
+## 5. CHECKLIST DE SEGURANÇA CONFERIDO (ANEXO B DA APOSTILA)
+
+- [x] **Senhas:** Criptografadas com algoritmo forte via `password_hash()` (Bcrypt). Nenhuma senha em texto puro no banco.
+- [x] **SQL Injection:** 100% das consultas utilizam Prepared Statements com PDO. Parâmetros dinâmicos nunca são concatenados diretamente na query.
+- [x] **Cross-Site Scripting (XSS):** Todo output dinâmico em HTML passa por sanitização via `htmlspecialchars(..., ENT_QUOTES, 'UTF-8')`.
+- [x] **Cross-Site Request Forgery (CSRF):** Todos os formulários que alteram estado utilizam tokens criptográficos por sessão via `validateCSRFToken()`.
+- [x] **Upload de Arquivos:** Restrição de tipo MIME verificado no servidor (JPEG, PNG, WEBP, GIF), limite rígido de 5MB e renomeação com hash randômico (`bin2hex(random_bytes(16))`).
+- [x] **Controle de Sessão:** `session_regenerate_id(true)` no login para prevenir fixação de sessão; expiração completa no logout.
+- [x] **Controle de Acesso:** Verificação rigorosa do perfil do usuário em cada tela protegida (`requireLogin()`, `requireAdmin()`).
+- [x] **Privacidade de Denúncias:** Ocultação de identificadores do denunciante em consultas públicas.
+- [x] **Credenciais Fora do Repositório:** O arquivo `.env` está devidamente listado no `.gitignore`. Apenas o modelo [.env.example](file:///c:/xampp/htdocs/housePet2/.env.example) é rastreado pelo Git.
+
+---
+
+## 6. LIMITAÇÕES E MELHORIAS FUTURAS
+
+- Envio de notificações automáticas por e-mail (SMTP) a cada mudança de status de moderação ou interesse recebido.
+- Integração com mapas interativos (Leaflet / OpenStreetMap) para geolocalização visual exata do ponto onde o animal foi visto.
+- Compressão e conversão automática de imagens no servidor para o formato otimizado WebP.

@@ -100,12 +100,14 @@ housePet2/
 │   └── moderacao.php               # Histórico e auditoria de ações de moderadores
 │
 ├── database/
-│   └── housepet_db.sql             # Estrutura completa DDL e dados iniciais
+│   ├── housepet_db.sql             # Estrutura completa DDL e dados iniciais
+│   └── schema.sql                  # Cópia do script SQL para referência do avaliador
 │
 ├── .env.example                    # Modelo de configuração de ambiente
 ├── .gitignore                      # Regras de exclusão do Git
+├── CHANGELOG.md                    # Registro das decisões e revisão crítica da IA
 ├── README.md                       # Documentação principal
-├── spec.md                         # Especificação técnica do sistema
+├── spec.md                         # Especificação técnica final do sistema
 └── index.php                       # Página inicial pública
 ```
 
