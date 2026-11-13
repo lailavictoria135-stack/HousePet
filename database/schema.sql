@@ -147,3 +147,4 @@ VALUES (
     'admin',
     1
 ) ON DUPLICATE KEY UPDATE id=id;
+
